@@ -1,7 +1,7 @@
 import sys
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QMainWindow,QWidget,QApplication,QVBoxLayout,QStackedLayout,QFormLayout,QMenuBar,QMenu,QLineEdit,QLabel,QComboBox,QTextEdit,QPushButton,QFileDialog
-from PyQt6.QtGui import QAction,QIcon
+from PyQt6.QtWidgets import QMainWindow,QWidget,QApplication,QVBoxLayout,QStackedLayout,QFormLayout,QMenuBar,QMenu,QLineEdit,QLabel,QComboBox,QTextEdit,QPushButton,QFileDialog,QInputDialog
+from PyQt6.QtGui import QAction,QIcon,QTextCursor,QColor
 
 class Window(QMainWindow):
   def __init__(self) :
@@ -66,6 +66,10 @@ class Window(QMainWindow):
     paste_action = QAction("Paste", self)
     self.edit_menu.addAction(paste_action)
     paste_action.triggered.connect(self.edit_field.paste)
+
+    find_action = QAction("Find", self)
+    self.edit_menu.addAction(find_action)
+    find_action.triggered.connect(self.find_text)
     
 
 
@@ -94,6 +98,23 @@ class Window(QMainWindow):
       with open(file_path, "w") as file:
         file.write(self.edit_field.toPlainText())
       self.current_file = file_path
+  
+  def find_text(self):
+    query, ok = QInputDialog.getText(self, "Find text", "Search for")
+    if ok:
+      all_words=[]
+      self.edit_field.moveCursor(QTextCursor.MoveOperation.Start)
+      highlight_color = QColor(Qt.GlobalColor.red)
+      
+      while(self.edit_field.find(query)):
+        selection = QTextEdit.ExtraSelection()
+        selection.format.setBackground(highlight_color)
+
+        selection.cursor = self.edit_field.textCursor()
+        all_words.append(selection)
+      
+      self.edit_field.setExtraSelections(all_words)
+    
 
 
 
